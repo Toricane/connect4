@@ -54,11 +54,19 @@ function available_moves(board) {
     return moves;
 }
 
-function has_won(board, symbol) {
+function has_won(board, symbol, which = false) {
     // check - spaces
     for (let y = 0; y < board[0].length; y++) {
         for (let x = 0; x < board.length - 3; x++) {
             if (board[x][y] === symbol && board[x + 1][y] === symbol && board[x + 2][y] === symbol && board[x + 3][y] === symbol) {
+                if (which) {
+                    return [
+                        [x, y],
+                        [x + 1, y],
+                        [x + 2, y],
+                        [x + 3, y]
+                    ];
+                }
                 return true;
             }
         }
@@ -67,6 +75,14 @@ function has_won(board, symbol) {
     for (let x = 0; x < board.length; x++) {
         for (let y = 0; y < board[0].length - 3; y++) {
             if (board[x][y] === symbol && board[x][y + 1] === symbol && board[x][y + 2] === symbol && board[x][y + 3] === symbol) {
+                if (which) {
+                    return [
+                        [x, y],
+                        [x, y + 1],
+                        [x, y + 2],
+                        [x, y + 3]
+                    ];
+                }
                 return true;
             }
         }
@@ -75,6 +91,14 @@ function has_won(board, symbol) {
     for (let x = 0; x < board.length - 3; x++) {
         for (let y = 3; y < board[0].length; y++) {
             if (board[x][y] === symbol && board[x + 1][y - 1] === symbol && board[x + 2][y - 2] === symbol && board[x + 3][y - 3] === symbol) {
+                if (which) {
+                    return [
+                        [x, y],
+                        [x + 1, y - 1],
+                        [x + 2, y - 2],
+                        [x + 3, y - 3]
+                    ];
+                }
                 return true;
             }
         }
@@ -83,6 +107,14 @@ function has_won(board, symbol) {
     for (let x = 0; x < board.length - 3; x++) {
         for (let y = 0; y < board[0].length - 3; y++) {
             if (board[x][y] === symbol && board[x + 1][y + 1] === symbol && board[x + 2][y + 2] === symbol && board[x + 3][y + 3] === symbol) {
+                if (which) {
+                    return [
+                        [x, y],
+                        [x + 1, y + 1],
+                        [x + 2, y + 2],
+                        [x + 3, y + 3]
+                    ];
+                }
                 return true;
             }
         }
@@ -94,39 +126,128 @@ function game_is_over(board) {
     return (has_won(board, "X") || has_won(board, "O") || available_moves(board).length === 0);
 }
 
-function evaluate_board(board) {
+function evaluate_board2(board) {
     if (has_won(board, "X")) {
         return Number.MAX_SAFE_INTEGER;
     } else if (has_won(board, "O")) {
         return Number.MIN_SAFE_INTEGER;
     } else {
-        const num_all_x = count_streaks(board, "X");
-        const num_all_o = count_streaks(board, "O");
+        const num_all_x = score(board, "X");
+        const num_all_o = score(board, "O");
         return num_all_x - num_all_o;
     }
 }
 
+function evaluateSequence(sequence, player) {
+    let score = 0;
+    let openEnds = 0;
+
+    for (let i = 0; i < 4; i++) {
+        if (sequence[i] === player) {
+            score++;
+        } else if (sequence[i] === " ") {
+            openEnds++;
+        } else {
+            break;
+        }
+    }
+
+    for (let i = 3; i >= 0; i--) {
+        if (sequence[i] === player) {
+            score++;
+        } else if (sequence[i] === " ") {
+            openEnds++;
+        } else {
+            break;
+        }
+    }
+
+    if (score === 4) {
+        return 100;
+    } else if (score === 3 && openEnds === 1) {
+        return 5;
+    } else if (score === 2 && openEnds === 2) {
+        return 2;
+    } else {
+        return 0;
+    }
+}
+
+function score(board, player) {
+    let totalScore = 0;
+
+    for (let row = 0; row < 6; row++) {
+        for (let col = 0; col < 7; col++) {
+            let sequence = [];
+            if (col <= 3) {
+                // Check horizontal sequence to the right
+                for (let i = col; i < col + 4; i++) {
+                    sequence.push(board[i][row]);
+                }
+                totalScore += evaluateSequence(sequence, player);
+
+                // Check diagonal down-right
+                if (row <= 2) {
+                    sequence = [];
+                    for (let i = 0; i < 4; i++) {
+                        sequence.push(board[col + i][row + i]);
+                    }
+                    totalScore += evaluateSequence(sequence, player);
+                }
+
+                // Check diagonal up-right
+                if (row >= 3) {
+                    sequence = [];
+                    for (let i = 0; i < 4; i++) {
+                        sequence.push(board[col + i][row - i]);
+                    }
+                    totalScore += evaluateSequence(sequence, player);
+                }
+            }
+
+            if (row <= 2) {
+                // Check vertical sequence
+                sequence = [];
+                for (let i = row; i < row + 4; i++) {
+                    sequence.push(board[col][i]);
+                }
+                totalScore += evaluateSequence(sequence, player);
+
+                // Check diagonal down-left
+                if (col >= 3) {
+                    sequence = [];
+                    for (let i = 0; i < 4; i++) {
+                        sequence.push(board[col - i][row + i]);
+                    }
+                    totalScore += evaluateSequence(sequence, player);
+                }
+            }
+        }
+    }
+
+    return totalScore;
+}
+
+
 function minimax(input_board, is_maximizing, depth, alpha, beta) {
     if (game_is_over(input_board) || depth === 0) {
-        return [evaluate_board(input_board), ""]
+        return [evaluate_board2(input_board), ""];
     }
-    let _alpha = deepcopy([alpha]);
-    let _beta = deepcopy([beta]);
     let moves = available_moves(input_board);
-    shuffle(moves);
-    let best_move = moves[0]
+    moves = sort_moves(moves, input_board, is_maximizing);
+    let best_move = moves[0];
     if (is_maximizing) {
         let best_value = Number.MIN_SAFE_INTEGER;
         for (const move of moves) {
             let new_board = deepcopy(input_board);
             select_space(new_board, move, "X");
-            const hypothetical_value = minimax(new_board, false, depth - 1, _alpha, _beta)[0];
+            const hypothetical_value = minimax(new_board, false, depth - 1, alpha, beta)[0];
             if (hypothetical_value > best_value) {
                 best_value = hypothetical_value;
                 best_move = move;
             }
-            let alpha = Math.max(_alpha, best_value);
-            if (alpha >= _beta) {
+            alpha = Math.max(alpha, best_value);
+            if (alpha >= beta) {
                 break;
             }
         }
@@ -136,13 +257,13 @@ function minimax(input_board, is_maximizing, depth, alpha, beta) {
         for (const move of moves) {
             let new_board = deepcopy(input_board);
             select_space(new_board, move, "O");
-            const hypothetical_value = minimax(new_board, true, depth - 1, _alpha, _beta)[0];
+            const hypothetical_value = minimax(new_board, true, depth - 1, alpha, beta)[0];
             if (hypothetical_value < best_value) {
                 best_value = hypothetical_value;
                 best_move = move;
             }
-            let beta = Math.min(_beta, best_value);
-            if (_alpha >= beta) {
+            beta = Math.min(beta, best_value);
+            if (alpha >= beta) {
                 break;
             }
         }
@@ -150,124 +271,19 @@ function minimax(input_board, is_maximizing, depth, alpha, beta) {
     }
 }
 
-function count_streaks(board, symbol) {
-    let count = 0;
-    let num_in_streak;
-    for (let col = 0; col < board.length; col++) {
-        for (let row = 0; row < board[0].length; row++) {
-            if (board[col][row] != symbol) {
-                continue;
-            }
-            // -->
-            if (col < board.length - 3) {
-                num_in_streak = 0;
-                for (let i = 0; i < 4; i++) {
-                    if (board[col + i][row] === symbol) {
-                        num_in_streak++;
-                    } else if (board[col + i][row] != " ") {
-                        num_in_streak = 0;
-                        break;
-                    }
-                }
-                count += num_in_streak;
-            }
-            // <--
-            if (col > 2) {
-                num_in_streak = 0;
-                for (let i = 0; i < 4; i++) {
-                    if (board[col - i][row] === symbol) {
-                        num_in_streak++;
-                    } else if (board[col - i][row] != " ") {
-                        num_in_streak = 0;
-                        break;
-                    }
-                }
-                count += num_in_streak;
-            }
-            // / up right
-            if (col < board.length - 3 && row > 2) {
-                num_in_streak = 0;
-                for (let i = 0; i < 4; i++) {
-                    if (board[col + i][row - 1] === symbol) {
-                        num_in_streak++;
-                    } else if (board[col + i][row - 1] != " ") {
-                        num_in_streak = 0;
-                        break;
-                    }
-                }
-                count += num_in_streak;
-            }
-            // \ down right
-            if (col < board.length - 3 && row < board[0].length - 3) {
-                num_in_streak = 0;
-                for (let i = 0; i < 4; i++) {
-                    if (board[col + i][row + 1] === symbol) {
-                        num_in_streak++;
-                    } else if (board[col + i][row + 1] != " ") {
-                        num_in_streak = 0;
-                        break;
-                    }
-                }
-                count += num_in_streak;
-            }
-            // / down left
-            if (col > 2 && row > board[0].length - 3) {
-                for (let i = 0; i < 4; i++) {
-                    if (board[col - i][row + 1] === symbol) {
-                        num_in_streak++;
-                    } else if (board[col - i][row + 1] != " ") {
-                        num_in_streak = 0;
-                        break;
-                    }
-                }
-                count += num_in_streak;
-            }
-            // \ up left
-            if (col > 2 && row > 2) {
-                for (let i = 0; i < 4; i++) {
-                    if (board[col - i][row - 1] === symbol) {
-                        num_in_streak++;
-                    } else if (board[col - i][row - 1] != " ") {
-                        num_in_streak = 0;
-                        break;
-                    }
-                }
-                count += num_in_streak;
-            }
-            // | down
-            num_in_streak = 0;
-            if (row < board[0].length - 3) {
-                for (let i = 0; i < 4; i++) {
-                    if (row + i < board[0].length) {
-                        if (board[col][row + i] === symbol) {
-                            num_in_streak++;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-            }
-            for (let i = 0; i < 4; i++) {
-                if (row - i > 0) {
-                    if (board[col][row - i] === symbol) {
-                        num_in_streak++;
-                    } else if (board[col][row - 1] === " ") {
-                        break;
-                    } else {
-                        num_in_streak = 0;
-                    }
-                }
-            }
-            if (row < 3) {
-                if (num_in_streak + row < 4) {
-                    num_in_streak = 0;
-                }
-            }
-            count += num_in_streak;
-        }
+function sort_moves(moves, input_board, is_maximizing) {
+    let values = [];
+    for (const move of moves) {
+        let new_board = deepcopy(input_board);
+        select_space(new_board, move, is_maximizing ? "X" : "O");
+        const hypothetical_value = evaluate_board2(new_board);
+        values.push([hypothetical_value, move]);
     }
-    return count;
+    values.sort((a, b) => (is_maximizing ? b[0] - a[0] : a[0] - b[0]));
+    return values.map(val => val[1]);
 }
+
+
 
 
 function generate_board() {
@@ -286,9 +302,11 @@ function generate_board() {
 function syncBoard() {
     const turnElement = document.getElementById("turn");
     if (turn === "X") {
-        turnElement.innerHTML = "Red's Turn";
+        turnElement.innerHTML = "<span class='span_red'>Red's Turn</span>";
+    } else if (turn === "O") {
+        turnElement.innerHTML = "<span class='span_yellow'>Yellow's Turn</span>";
     } else {
-        turnElement.innerHTML = "Yellow's Turn";
+        turnElement.innerHTML = "";
     }
     const table = document.getElementById("board");
     table.innerHTML = "";
@@ -300,9 +318,9 @@ function syncBoard() {
             cell.setAttribute("id", `${x},${y}`);
             cell.setAttribute("onclick", "dropPiece(this.id)");
             if (board[x][y] === "X") {
-                cell.className = "red";
+                cell.className = "cell red";
             } else if (board[x][y] === "O") {
-                cell.className = "yellow";
+                cell.className = "cell yellow";
             }
             row.appendChild(cell);
         }
@@ -311,10 +329,17 @@ function syncBoard() {
 
     if (has_won(board, "X") || has_won(board, "O")) {
         const turnElement = document.getElementById("turn");
+        let coords;
         if (turn === "X") {
-            turnElement.innerHTML = "Yellow Wins!";
+            turnElement.innerHTML = "<span class='span_yellow'>Yellow Wins!</span>";
+            coords = has_won(board, "O", true);
         } else {
-            turnElement.innerHTML = "Red Wins!";
+            turnElement.innerHTML = "<span class='span_red'>Red Wins!</span>";
+            coords = has_won(board, "X", true);
+        }
+        for (let i = 0; i < coords.length; i++) {
+            const cell = document.getElementById(`${coords[i][0]},${coords[i][1]}`);
+            cell.className = `cell win_${turn === "X" ? "yellow" : "red"}`;
         }
     } else if (game_is_over(board)) {
         const turnElement = document.getElementById("turn");
@@ -325,7 +350,7 @@ function syncBoard() {
 let turn = "X";
 
 function dropPiece(id, pl = true) {
-    if (ai && turn === ai && pl || game_is_over(board)) return;
+    if (ai && turn === ai && pl || game_is_over(board) || thinking && pl) return;
     let col;
     if (typeof id === "string") {
         col = parseInt(id.split(",")[0]);
@@ -335,14 +360,15 @@ function dropPiece(id, pl = true) {
     if (!pl) {
         col -= 1;
     }
-    place(turn, col + 1);
+    if (!place(turn, col + 1)) return;
     if (turn === "X") {
         turn = "O";
     } else {
         turn = "X";
     }
+    thinking = pl
     syncBoard();
-    handleGameLogic();
+    setTimeout(() => { handleGameLogic() }, 0);
 }
 
 function place(player, column) {
@@ -364,6 +390,7 @@ function place(player, column) {
 
 let board = generate_board();
 let ai = "";
+let thinking = false;
 
 syncBoard();
 
@@ -375,23 +402,16 @@ function handleGameLogic() {
     if (!game_is_over(board)) {
         if (ai === turn) {
             const ai_level = parseInt(document.getElementById("ai-level").value);
-            let col;
-            if (ai === "X") {
-                col = parseInt(minimax(board, true, ai_level, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)[1]);
-            }
-            if (ai === "O") {
-                col = parseInt(minimax(board, false, ai_level, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)[1]);
-            }
+            let col = parseInt(minimax(board, ai === "X", ai_level, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)[1]);
             dropPiece(col, false);
-            console.log(col);
         }
         syncBoard();
     } else if (has_won(board, "X") || has_won(board, "O")) {
         const turnElement = document.getElementById("turn");
         if (turn === "X") {
-            turnElement.innerHTML = "Yellow Wins!";
+            turnElement.innerHTML = "<span class='span_yellow'>Yellow Wins!</span>";
         } else {
-            turnElement.innerHTML = "Red Wins!";
+            turnElement.innerHTML = "<span class='span_red'>Red Wins!</span>";
         }
     } else {
         const turnElement = document.getElementById("turn");
@@ -403,10 +423,24 @@ function startAIGame() {
     board = generate_board();
     syncBoard();
     turn = "X";
-    if (getRandomInt() === 1) {
+    const whoFirst = document.getElementById("who-first").value;
+    if (whoFirst === "random") {
+        if (getRandomInt() === 1) {
+            ai = "X";
+        } else {
+            ai = "O";
+        }
+    } else if (whoFirst === "ai") {
         ai = "X";
     } else {
         ai = "O";
     }
     handleGameLogic();
+}
+
+function resetBoard() {
+    board = generate_board();
+    turn = "X";
+    ai = "";
+    syncBoard();
 }

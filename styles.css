@@ -3,36 +3,66 @@ body {
 }
 
 #board {
-    /* width: 70%; */
     margin: 0 auto;
     text-align: center;
-    border-collapse: collapse;
+    background-color: #037cdf;
+    border-radius: 24px;
+    padding: 8px;
 }
 
 #board td {
     width: 50px;
     height: 50px;
-    border: 1px solid black;
+    border: 4px solid #037cdf;
     text-align: center;
     vertical-align: middle;
     border-radius: 25px;
+    background-color: #FFFFFF;
+    box-sizing: border-box;
 }
 
 #board td.cell {
     width: 50px;
     height: 50px;
+    border-radius: 50%;
+    background-color: #FFFFFF;
+    box-sizing: border-box;
 }
 
 .red {
-    background-color: #ff4d4d;
-    border: 2px solid #c9302c;
+    background-color: hsl(0, 100%, 60%) !important;
+    border: 4px solid hsl(0, 100%, 40%) !important;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
+    box-sizing: border-box;
 }
 
 .yellow {
-    background-color: #ffff4d;
-    border: 2px solid #8a6d3b;
+    background-color: hsl(60, 100%, 60%) !important;
+    border: 4px solid hsl(60, 100%, 40%) !important;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
+    box-sizing: border-box;
+}
+
+.win_red {
+    background-color: hsl(0, 100%, 40%) !important;
+    border: 4px solid hsl(0, 100%, 60%) !important;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    box-sizing: border-box;
+}
+
+.win_yellow {
+    background-color: hsl(60, 100%, 40%) !important;
+    border: 4px solid hsl(60, 100%, 60%) !important;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    box-sizing: border-box;
 }
 
 h1 {
@@ -46,6 +76,7 @@ select {
     border: 1px solid #ccc;
     appearance: none;
     background-color: white;
+    margin-right: 24px;
 }
 
 .center {
@@ -68,9 +99,48 @@ select {
     border: 1px solid #4CAF50;
     cursor: pointer;
     margin-top: 0px;
+    margin-right: 1em;
+    font-family: monospace;
 }
 
 #start:hover {
     background-color: #3E8E41;
     border: 1px solid #3E8E41;
+}
+
+#reset {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    background-color: hsl(0, 39%, 49%);
+    color: #FFFFFF;
+    border-radius: 5px;
+    border: 1px solid hsl(0, 39%, 49%);
+    cursor: pointer;
+    margin-top: 0px;
+    font-family: monospace;
+}
+
+#reset:hover {
+    background-color: hsl(0, 39%, 40%);
+    border: 1px solid hsl(0, 39%, 40%);
+}
+
+label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.span_yellow {
+    text-shadow: 1px 1px 1px black;
+    color: yellow;
+}
+
+.span_red {
+    text-shadow: 1px 1px 1px black;
+    color: red;
 }

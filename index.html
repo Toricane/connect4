@@ -25,9 +25,16 @@
       <option value="9">9</option>
       <option value="10">10</option>
     </select>
+    <label for="who-first">Who goes first: </label>
+    <select id="who-first">
+      <option value="random">Random</option>
+      <option value="player">Me</option>
+      <option value="ai">AI</option>
+    </select>
   </div>
   <div class="center">
     <button id="start" onclick="startAIGame()">Start</button>
+    <button id="reset" onclick="resetBoard()">Reset</button>
   </div>
   <div id="turn" class="center"></div>
 
