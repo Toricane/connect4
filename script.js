@@ -350,7 +350,7 @@ function syncBoard() {
 let turn = "X";
 
 function dropPiece(id, pl = true) {
-    if (ai && turn === ai && pl || game_is_over(board) || thinking && pl) return;
+    if (ai && turn === ai && pl || game_is_over(board)) return;
     let col;
     if (typeof id === "string") {
         col = parseInt(id.split(",")[0]);
@@ -390,7 +390,6 @@ function place(player, column) {
 
 let board = generate_board();
 let ai = "";
-let thinking = false;
 
 syncBoard();
 
