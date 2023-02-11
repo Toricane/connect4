@@ -1,5 +1,17 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: radial-gradient(circle at center bottom, #ffdd59, #ff7b59), #ffdd59;
+    background-size: cover !important;
+    color: #333333;
+}
+
+.bubble {
+    background: radial-gradient(circle at center bottom, #ffdd59, #ff7b59);
+    margin: 0.5em auto;
+    padding: 0.25em;
+    max-width: 500px;
+    min-width: 200px;
+    border-radius: 25px;
 }
 
 #board {
@@ -17,7 +29,7 @@ body {
     text-align: center;
     vertical-align: middle;
     border-radius: 25px;
-    background-color: #FFFFFF;
+    background-color: #87baff;
     box-sizing: border-box;
 }
 
@@ -25,7 +37,7 @@ body {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: #FFFFFF;
+    background-color: #87baff;
     box-sizing: border-box;
 }
 
@@ -65,8 +77,19 @@ body {
     box-sizing: border-box;
 }
 
+.draw {
+    background-color: hsl(0, 0%, 40%) !important;
+    border: 4px solid hsl(0, 0%, 60%) !important;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    box-sizing: border-box;
+}
+
 h1 {
     text-align: center;
+    margin: 0;
+    padding: 0;
 }
 
 select {
@@ -135,12 +158,36 @@ label {
     margin-right: 10px;
 }
 
+span {
+    font-size: 20px;
+    text-shadow: 1px 1px 2px black;
+}
+
 .span_yellow {
-    text-shadow: 1px 1px 1px black;
     color: yellow;
 }
 
 .span_red {
-    text-shadow: 1px 1px 1px black;
     color: red;
+}
+
+.notification {
+    animation: pulse 4s ease-in-out 0s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    10% {
+        transform: scale(1.2);
+    }
+    20% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1);
+        animation-timing-function: ease-in-out;
+        animation-iteration-count: 1;
+    }
 }

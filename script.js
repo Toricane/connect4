@@ -309,11 +309,16 @@ function generate_board() {
 }
 
 function syncBoard() {
+    document.getElementById("notif-D").hidden = true;
     const turnElement = document.getElementById("turn");
+    const notifElement = document.getElementById(`notif-${turn}`);
+    const notifElement2 = document.getElementById(`notif-${turn === "X" ? "O" : "X"}`);
+    notifElement.hidden = false;
+    notifElement2.hidden = true;
     if (turn === "X") {
-        turnElement.innerHTML = "<span class='span_red'>Red's Turn</span>";
+        turnElement.innerHTML = `<span class='span_red'>${ai === 'X' ? 'AI\'s' : ai ? 'Your' : 'Red\'s'} Turn</span>`;
     } else if (turn === "O") {
-        turnElement.innerHTML = "<span class='span_yellow'>Yellow's Turn</span>";
+        turnElement.innerHTML = `<span class='span_yellow'>${ai === 'O' ? 'AI\'s' : ai ? 'Your' : 'Yellow\'s'} Turn</span>`;
     } else {
         turnElement.innerHTML = "";
     }
@@ -338,6 +343,11 @@ function syncBoard() {
 
     if (has_won(board, "X") || has_won(board, "O")) {
         const turnElement = document.getElementById("turn");
+        const notifElement = document.getElementById(`notif-${turn}`);
+        const notifElement2 = document.getElementById(`notif-${turn === "X" ? "O" : "X"}`);
+        notifElement.hidden = true;
+        notifElement2.hidden = false;
+
         let coords;
         if (turn === "X") {
             turnElement.innerHTML = "<span class='span_yellow'>Yellow Wins!</span>";
@@ -352,7 +362,10 @@ function syncBoard() {
         }
     } else if (game_is_over(board)) {
         const turnElement = document.getElementById("turn");
-        turnElement.innerHTML = "Draw!";
+        turnElement.innerHTML = "<span>Draw!</span>";
+        notifElement.hidden = true;
+        notifElement2.hidden = true;
+        document.getElementById("notif-D").hidden = false;
     }
 }
 
@@ -378,7 +391,7 @@ function dropPiece(id, pl = true) {
     }
     syncBoard();
     document.getElementById(res).className = `win_${turn === "X" ? "yellow" : "red"}`;
-    setTimeout(() => { handleGameLogic() }, 0);
+    setTimeout(() => { handleGameLogic() }, 1);
 }
 
 function place(player, column) {
@@ -423,13 +436,13 @@ function handleGameLogic() {
         }
     } else {
         const turnElement = document.getElementById("turn");
-        turnElement.innerHTML = "Draw!";
+        turnElement.innerHTML = "<span>Draw!</span>";
     }
 }
 
 function startAIGame() {
     board = generate_board();
-    syncBoard();
+    // syncBoard();
     turn = "X";
     const whoFirst = document.getElementById("who-first").value;
     if (whoFirst === "random") {
@@ -443,7 +456,8 @@ function startAIGame() {
     } else {
         ai = "O";
     }
-    handleGameLogic();
+    syncBoard();
+    setTimeout(() => { handleGameLogic() }, 1);
 }
 
 function resetBoard() {
