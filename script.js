@@ -126,7 +126,7 @@ function game_is_over(board) {
     return (has_won(board, "X") || has_won(board, "O") || available_moves(board).length === 0);
 }
 
-function evaluate_board2(board) {
+function evaluate_board(board) {
     if (has_won(board, "X")) {
         return Number.MAX_SAFE_INTEGER;
     } else if (has_won(board, "O")) {
@@ -139,12 +139,12 @@ function evaluate_board2(board) {
 }
 
 function evaluateSequence(sequence, player) {
-    let score = 0;
+    let filled = 0;
     let openEnds = 0;
 
     for (let i = 0; i < 4; i++) {
         if (sequence[i] === player) {
-            score++;
+            filled++;
         } else if (sequence[i] === " ") {
             openEnds++;
         } else {
@@ -154,7 +154,7 @@ function evaluateSequence(sequence, player) {
 
     for (let i = 3; i >= 0; i--) {
         if (sequence[i] === player) {
-            score++;
+            filled++;
         } else if (sequence[i] === " ") {
             openEnds++;
         } else {
@@ -162,14 +162,14 @@ function evaluateSequence(sequence, player) {
         }
     }
 
-    if (score === 4) {
-        return 100;
-    } else if (score === 3 && openEnds === 1) {
-        return 5;
-    } else if (score === 2 && openEnds === 2) {
-        return 2;
+    if (filled === 4) {
+        return 4 ** 4;
+    } else if (filled === 3 && openEnds === 1) {
+        return 3 ** 3;
+    } else if (filled === 2 && openEnds === 2) {
+        return 2 ** 2;
     } else {
-        return 0;
+        return 1;
     }
 }
 
@@ -224,6 +224,13 @@ function score(board, player) {
             }
         }
     }
+    let num_player = 0
+    for (let slot of board[3]) {
+        if (slot === player) {
+            num_player += 1
+        }
+    }
+    totalScore += num_player
 
     return totalScore;
 }
@@ -231,7 +238,7 @@ function score(board, player) {
 
 function minimax(input_board, is_maximizing, depth, alpha, beta) {
     if (game_is_over(input_board) || depth === 0) {
-        return [evaluate_board2(input_board), ""];
+        return [evaluate_board(input_board), ""];
     }
     let moves = available_moves(input_board);
     moves = sort_moves(moves, input_board, is_maximizing);
@@ -271,12 +278,14 @@ function minimax(input_board, is_maximizing, depth, alpha, beta) {
     }
 }
 
+
+
 function sort_moves(moves, input_board, is_maximizing) {
     let values = [];
     for (const move of moves) {
         let new_board = deepcopy(input_board);
         select_space(new_board, move, is_maximizing ? "X" : "O");
-        const hypothetical_value = evaluate_board2(new_board);
+        const hypothetical_value = evaluate_board(new_board);
         values.push([hypothetical_value, move]);
     }
     values.sort((a, b) => (is_maximizing ? b[0] - a[0] : a[0] - b[0]));
@@ -360,14 +369,15 @@ function dropPiece(id, pl = true) {
     if (!pl) {
         col -= 1;
     }
-    if (!place(turn, col + 1)) return;
+    const res = place(turn, col + 1);
+    if (!res) return;
     if (turn === "X") {
         turn = "O";
     } else {
         turn = "X";
     }
-    thinking = pl
     syncBoard();
+    document.getElementById(res).className = `win_${turn === "X" ? "yellow" : "red"}`;
     setTimeout(() => { handleGameLogic() }, 0);
 }
 
@@ -382,7 +392,7 @@ function place(player, column) {
     for (let y = board[0].length - 1; y >= 0; y--) {
         if (board[column - 1][y] === ' ') {
             board[column - 1][y] = player;
-            return true;
+            return `${column - 1},${y}`;
         }
     }
     return false;
@@ -404,7 +414,6 @@ function handleGameLogic() {
             let col = parseInt(minimax(board, ai === "X", ai_level, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)[1]);
             dropPiece(col, false);
         }
-        syncBoard();
     } else if (has_won(board, "X") || has_won(board, "O")) {
         const turnElement = document.getElementById("turn");
         if (turn === "X") {
