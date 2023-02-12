@@ -7,7 +7,7 @@ html {
 }
 
 .bubble {
-    background: radial-gradient(circle at center bottom, #ffdd59, #ff7b59);
+    background: radial-gradient(circle at center bottom, #ffdd59, #ff7b59), #ffdd59;
     margin: 0.5em auto;
     padding: 0.25em;
     max-width: 500px;
