@@ -10,7 +10,7 @@ html {
     background: radial-gradient(circle at center bottom, #ffdd59, #ff7b59), #ffdd59;
     margin: 0.5em auto;
     padding: 0.25em;
-    max-width: 500px;
+    max-width: 400px;
     min-width: 200px;
     border-radius: 25px;
 }
@@ -32,6 +32,7 @@ html {
     border-radius: 25px;
     background-color: #87baff;
     box-sizing: border-box;
+    cursor: pointer;
 }
 
 #board td.cell {
@@ -95,12 +96,17 @@ h1 {
 
 select {
     font-size: 16px;
-    padding: 10px 20px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    padding: 10px 16px;
+    border-radius: 32px;
+    border: 3px solid steelblue;
     appearance: none;
-    background-color: white;
+    background-color: rgb(174, 214, 241);
     margin-right: 24px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.last {
+    margin-right: 0;
 }
 
 .center {
@@ -117,10 +123,10 @@ select {
     font-weight: bold;
     text-align: center;
     text-decoration: none;
-    background-color: #4CAF50;
+    background-color: steelblue;
     color: #FFFFFF;
     border-radius: 5px;
-    border: 1px solid #4CAF50;
+    border: 1px solid steelblue;
     cursor: pointer;
     margin-top: 0px;
     margin-right: 1em;
@@ -128,8 +134,8 @@ select {
 }
 
 #start:hover {
-    background-color: #3E8E41;
-    border: 1px solid #3E8E41;
+    background-color: royalblue;
+    border: 1px solid royalblue;
 }
 
 #reset {
@@ -139,18 +145,18 @@ select {
     font-weight: bold;
     text-align: center;
     text-decoration: none;
-    background-color: hsl(0, 39%, 49%);
+    background-color: steelblue;
     color: #FFFFFF;
     border-radius: 5px;
-    border: 1px solid hsl(0, 39%, 49%);
+    border: 1px solid steelblue;
     cursor: pointer;
     margin-top: 0px;
     font-family: monospace;
 }
 
 #reset:hover {
-    background-color: hsl(0, 39%, 40%);
-    border: 1px solid hsl(0, 39%, 40%);
+    background-color: royalblue;
+    border: 1px solid royalblue;
 }
 
 label {

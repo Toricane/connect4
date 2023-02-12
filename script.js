@@ -367,6 +367,28 @@ function syncBoard() {
         notifElement2.hidden = true;
         document.getElementById("notif-D").hidden = false;
     }
+    document.querySelectorAll("td").forEach(cell => {
+        cell.addEventListener("mouseenter", function() {
+            const column = this.id.split(",")[0];
+            const cellsInColumn = document.querySelectorAll(`td[id^="${column},"]`);
+            if (cellsInColumn[0].classList.length) return;
+            let bottomCell = cellsInColumn[cellsInColumn.length - 1];
+            while (bottomCell.classList.length > 0) {
+                bottomCell = cellsInColumn[bottomCell.id.split(",")[1] - 1];
+            }
+            bottomCell.style.backgroundColor = "rgb(174, 214, 241)";
+        });
+        cell.addEventListener("mouseleave", function() {
+            const column = this.id.split(",")[0];
+            const cellsInColumn = document.querySelectorAll(`td[id^="${column},"]`);
+            if (cellsInColumn[0].classList.length) return;
+            let bottomCell = cellsInColumn[cellsInColumn.length - 1];
+            while (bottomCell.classList.length > 0) {
+                bottomCell = cellsInColumn[bottomCell.id.split(",")[1] - 1];
+            }
+            bottomCell.style.backgroundColor = "";
+        });
+    });
 }
 
 let turn = "X";
